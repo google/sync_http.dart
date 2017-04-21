@@ -1,6 +1,11 @@
 Dart Synchronous HTTP Client
 ============================
 
+**Important Note:** This package requires the RawSynchronousSocket class to
+work, which should become available in version 1.24 of the Dart SDK. If you
+really want to use this package now, you'll have to build the Dart VM from
+the most up-to-date source hosted in dart-lang/sdk.
+
 A simple Dart HTTP client implemented using RawSynchronousSockets to allow for
 synchronous HTTP requests.
 
