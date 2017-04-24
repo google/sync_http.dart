@@ -1,0 +1,16 @@
+language: dart
+sudo: false
+
+os:
+  - linux
+  - osx
+
+dart:
+  - dev
+# TODO(bkonyi) enable testing on stable Dart SDK after 1.24 is released.
+#  - stable
+
+dart_task:
+  - test: -p vm
+  - dartfmt
+  - dartanalyzer
