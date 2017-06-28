@@ -3,8 +3,9 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import "dart:async";
-import "dart:isolate";
 import "dart:io";
+import "dart:isolate";
+
 import "package:sync_http/sync_http.dart";
 import "package:test/test.dart";
 
@@ -173,12 +174,13 @@ class TestServer {
 
   SendPort get dispatchSendPort => _dispatchPort.sendPort;
 
-  void dispatch(var message) {
+  dispatch(var message) async {
     TestServerCommand command = message[0];
     SendPort replyTo = message[1];
     if (command.isStart) {
       try {
-        HttpServer.bind("127.0.0.1", 0).then((server) {
+        var addr = (await InternetAddress.lookup("localhost"))[0];
+        HttpServer.bind(addr, 0).then((server) {
           _server = server;
           _server.listen(_requestReceivedHandler);
           replyTo.send(new TestServerStatus.started(_server.port));
@@ -223,7 +225,7 @@ Future testGET() async {
   TestServerMain testServerMain = new TestServerMain();
   testServerMain.setServerStartedHandler((int port) {
     var request =
-        SyncHttpClient.getUrl(new Uri.http("127.0.0.1:$port", "/0123456789"));
+        SyncHttpClient.getUrl(new Uri.http("localhost:$port", "/0123456789"));
     var response = request.close();
     expect(HttpStatus.OK, equals(response.statusCode));
     expect(11, equals(response.contentLength));
@@ -246,7 +248,7 @@ Future testPOST() async {
     int count = 0;
     void sendRequest() {
       var request =
-          SyncHttpClient.postUrl(new Uri.http("127.0.0.1:$port", "/echo"));
+          SyncHttpClient.postUrl(new Uri.http("localhost:$port", "/echo"));
       request.write(data);
       var response = request.close();
       expect(HttpStatus.OK, equals(response.statusCode));
@@ -273,7 +275,7 @@ Future test404() async {
   TestServerMain testServerMain = new TestServerMain();
   testServerMain.setServerStartedHandler((int port) {
     var request = SyncHttpClient
-        .getUrl(new Uri.http("127.0.0.1:$port", "/thisisnotfound"));
+        .getUrl(new Uri.http("localhost:$port", "/thisisnotfound"));
     var response = request.close();
     expect(HttpStatus.NOT_FOUND, equals(response.statusCode));
     expect("Page not found", equals(response.body));
@@ -289,7 +291,7 @@ Future testReasonPhrase() async {
   TestServerMain testServerMain = new TestServerMain();
   testServerMain.setServerStartedHandler((int port) {
     var request = SyncHttpClient
-        .getUrl(new Uri.http("127.0.0.1:$port", "/reasonformoving"));
+        .getUrl(new Uri.http("localhost:$port", "/reasonformoving"));
     var response = request.close();
     expect(HttpStatus.MOVED_PERMANENTLY, equals(response.statusCode));
     expect(
@@ -306,7 +308,7 @@ Future testHuge() async {
   TestServerMain testServerMain = new TestServerMain();
   testServerMain.setServerStartedHandler((int port) {
     var request =
-        SyncHttpClient.getUrl(new Uri.http("127.0.0.1:$port", "/huge"));
+        SyncHttpClient.getUrl(new Uri.http("localhost:$port", "/huge"));
     var response = request.close();
     String expected =
         new List<int>.generate((1 << 20), (i) => (i + 1) % 256).toString();
