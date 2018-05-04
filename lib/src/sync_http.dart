@@ -130,7 +130,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
         if (values == null || values.isEmpty) {
           return null;
         }
-        return values.map((e) => e.toString()).toList(growable: false);
+        return values.map<String>((e) => e.toString()).toList(growable: false);
     }
   }
 
@@ -152,7 +152,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
         break;
       default:
         if (_headers[name] == null) {
-          _headers[name] = [];
+          _headers[name] = <String>[];
         }
         _headers[name].add(value);
     }
