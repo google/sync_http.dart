@@ -52,7 +52,7 @@ class SyncHttpClientRequest {
   final Uri uri;
 
   /// The default encoding for the HTTP request (UTF8).
-  final Encoding encoding = UTF8;
+  final Encoding encoding = utf8;
 
   /// The body of the HTTP request. This can be empty if there is no body
   /// associated with the request.
@@ -107,23 +107,23 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   @override
   List<String> operator [](String name) {
     switch (name) {
-      case HttpHeaders.ACCEPT_CHARSET:
+      case HttpHeaders.acceptCharsetHeader:
         return ['utf-8'];
-      case HttpHeaders.ACCEPT_ENCODING:
+      case HttpHeaders.acceptEncodingHeader:
         return ['identity'];
-      case HttpHeaders.CONNECTION:
+      case HttpHeaders.connectionHeader:
         return ['close'];
-      case HttpHeaders.CONTENT_LENGTH:
+      case HttpHeaders.contentLengthHeader:
         if (!_request.hasBody) {
           return null;
         }
         return [contentLength.toString()];
-      case HttpHeaders.CONTENT_TYPE:
+      case HttpHeaders.contentTypeHeader:
         if (contentType == null) {
           return null;
         }
         return [contentType.toString()];
-      case HttpHeaders.HOST:
+      case HttpHeaders.hostHeader:
         return ['$host:$port'];
       default:
         var values = _headers[name];
@@ -138,16 +138,16 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   @override
   void add(String name, Object value) {
     switch (name) {
-      case HttpHeaders.ACCEPT_CHARSET:
-      case HttpHeaders.ACCEPT_ENCODING:
-      case HttpHeaders.CONNECTION:
-      case HttpHeaders.CONTENT_LENGTH:
-      case HttpHeaders.DATE:
-      case HttpHeaders.EXPIRES:
-      case HttpHeaders.IF_MODIFIED_SINCE:
-      case HttpHeaders.HOST:
+      case HttpHeaders.acceptCharsetHeader:
+      case HttpHeaders.acceptEncodingHeader:
+      case HttpHeaders.connectionHeader:
+      case HttpHeaders.contentLengthHeader:
+      case HttpHeaders.dateHeader:
+      case HttpHeaders.expiresHeader:
+      case HttpHeaders.ifModifiedSinceHeader:
+      case HttpHeaders.hostHeader:
         throw new UnsupportedError('Unsupported or immutable property: $name');
-      case HttpHeaders.CONTENT_TYPE:
+      case HttpHeaders.contentTypeHeader:
         contentType = value;
         break;
       default:
@@ -162,16 +162,16 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   @override
   void remove(String name, Object value) {
     switch (name) {
-      case HttpHeaders.ACCEPT_CHARSET:
-      case HttpHeaders.ACCEPT_ENCODING:
-      case HttpHeaders.CONNECTION:
-      case HttpHeaders.CONTENT_LENGTH:
-      case HttpHeaders.DATE:
-      case HttpHeaders.EXPIRES:
-      case HttpHeaders.IF_MODIFIED_SINCE:
-      case HttpHeaders.HOST:
+      case HttpHeaders.acceptCharsetHeader:
+      case HttpHeaders.acceptEncodingHeader:
+      case HttpHeaders.connectionHeader:
+      case HttpHeaders.contentLengthHeader:
+      case HttpHeaders.dateHeader:
+      case HttpHeaders.expiresHeader:
+      case HttpHeaders.ifModifiedSinceHeader:
+      case HttpHeaders.hostHeader:
         throw new UnsupportedError('Unsupported or immutable property: $name');
-      case HttpHeaders.CONTENT_TYPE:
+      case HttpHeaders.contentTypeHeader:
         if (contentType == value) {
           contentType = null;
         }
@@ -190,16 +190,16 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   @override
   void removeAll(String name) {
     switch (name) {
-      case HttpHeaders.ACCEPT_CHARSET:
-      case HttpHeaders.ACCEPT_ENCODING:
-      case HttpHeaders.CONNECTION:
-      case HttpHeaders.CONTENT_LENGTH:
-      case HttpHeaders.DATE:
-      case HttpHeaders.EXPIRES:
-      case HttpHeaders.IF_MODIFIED_SINCE:
-      case HttpHeaders.HOST:
+      case HttpHeaders.acceptCharsetHeader:
+      case HttpHeaders.acceptEncodingHeader:
+      case HttpHeaders.connectionHeader:
+      case HttpHeaders.contentLengthHeader:
+      case HttpHeaders.dateHeader:
+      case HttpHeaders.expiresHeader:
+      case HttpHeaders.ifModifiedSinceHeader:
+      case HttpHeaders.hostHeader:
         throw new UnsupportedError('Unsupported or immutable property: $name');
-      case HttpHeaders.CONTENT_TYPE:
+      case HttpHeaders.contentTypeHeader:
         contentType = null;
         break;
       default:
@@ -239,12 +239,12 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
     };
 
     [
-      HttpHeaders.ACCEPT_CHARSET,
-      HttpHeaders.ACCEPT_ENCODING,
-      HttpHeaders.CONNECTION,
-      HttpHeaders.CONTENT_LENGTH,
-      HttpHeaders.CONTENT_TYPE,
-      HttpHeaders.HOST
+      HttpHeaders.acceptCharsetHeader,
+      HttpHeaders.acceptEncodingHeader,
+      HttpHeaders.connectionHeader,
+      HttpHeaders.contentLengthHeader,
+      HttpHeaders.contentTypeHeader,
+      HttpHeaders.hostHeader
     ].forEach(forEachFunc);
     _headers.keys.forEach(forEachFunc);
   }
@@ -372,12 +372,12 @@ class SyncHttpClientResponse {
         int separator = line.indexOf(':');
         String name = line.substring(0, separator).toLowerCase().trim();
         String value = line.substring(separator + 1).trim();
-        if (name == HttpHeaders.TRANSFER_ENCODING &&
+        if (name == HttpHeaders.transferEncodingHeader &&
             value.toLowerCase() != 'identity') {
           throw new UnsupportedError(
               'only identity transfer encoding is accepted');
         }
-        if (name == HttpHeaders.CONTENT_LENGTH) {
+        if (name == HttpHeaders.contentLengthHeader) {
           contentLength = int.parse(value);
         }
         if (!headers.containsKey(name)) {
@@ -385,8 +385,8 @@ class SyncHttpClientResponse {
         }
         headers[name].add(value);
       } else if (line.startsWith('HTTP/1.1') || line.startsWith('HTTP/1.0')) {
-        statusCode = int
-            .parse(line.substring('HTTP/1.x '.length, 'HTTP/1.x xxx'.length));
+        statusCode = int.parse(
+            line.substring('HTTP/1.x '.length, 'HTTP/1.x xxx'.length));
         reasonPhrase = line.substring('HTTP/1.x xxx '.length);
         inHeader = true;
       } else {
@@ -450,9 +450,9 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   int get contentLength {
-    String val = value(HttpHeaders.CONTENT_LENGTH);
+    String val = value(HttpHeaders.contentLengthHeader);
     if (val != null) {
-      return int.parse(val, onError: (_) => null);
+      return int.tryParse(val);
     }
     return null;
   }
@@ -464,7 +464,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   ContentType get contentType {
-    var val = value(HttpHeaders.CONTENT_TYPE);
+    var val = value(HttpHeaders.contentTypeHeader);
     if (val != null) {
       return ContentType.parse(val);
     }
@@ -483,7 +483,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   DateTime get date {
-    var val = value(HttpHeaders.DATE);
+    var val = value(HttpHeaders.dateHeader);
     if (val != null) {
       return DateTime.parse(val);
     }
@@ -497,7 +497,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   DateTime get expires {
-    var val = value(HttpHeaders.EXPIRES);
+    var val = value(HttpHeaders.expiresHeader);
     if (val != null) {
       return DateTime.parse(val);
     }
@@ -514,7 +514,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   String get host {
-    var val = value(HttpHeaders.HOST);
+    var val = value(HttpHeaders.hostHeader);
     if (val != null) {
       return Uri.parse(val).host;
     }
@@ -523,7 +523,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   DateTime get ifModifiedSince {
-    var val = value(HttpHeaders.IF_MODIFIED_SINCE);
+    var val = value(HttpHeaders.ifModifiedSinceHeader);
     if (val != null) {
       return DateTime.parse(val);
     }
@@ -555,7 +555,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   int get port {
-    var val = value(HttpHeaders.HOST);
+    var val = value(HttpHeaders.hostHeader);
     if (val != null) {
       return Uri.parse(val).port;
     }
