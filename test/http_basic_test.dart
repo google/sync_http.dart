@@ -122,7 +122,7 @@ class TestServer {
   // Return a 404.
   void _notFoundHandler(HttpRequest request) {
     var response = request.response;
-    response.statusCode = HttpStatus.NOT_FOUND;
+    response.statusCode = HttpStatus.notFound;
     String msg = "Page not found";
     response.contentLength = msg.length;
     response.headers.set("Content-Type", "text/html; charset=UTF-8");
@@ -133,7 +133,7 @@ class TestServer {
   // Return a 301 with a custom reason phrase.
   void _reasonForMovingHandler(HttpRequest request) {
     var response = request.response;
-    response.statusCode = HttpStatus.MOVED_PERMANENTLY;
+    response.statusCode = HttpStatus.movedPermanently;
     response.reasonPhrase = "Don't come looking here any more";
     response.close();
   }
@@ -145,7 +145,7 @@ class TestServer {
     expect("www.dartlang.org:1234", equals(request.headers["Host"][0]));
     expect("www.dartlang.org", equals(request.headers.host));
     expect(1234, equals(request.headers.port));
-    response.statusCode = HttpStatus.OK;
+    response.statusCode = HttpStatus.ok;
     response.close();
   }
 
@@ -155,7 +155,7 @@ class TestServer {
         new List<int>.generate((1 << 20), (i) => (i + 1) % 256);
     String msg = expected.toString();
     response.contentLength = msg.length;
-    response.statusCode = HttpStatus.OK;
+    response.statusCode = HttpStatus.ok;
     response.write(msg);
     response.close();
   }
@@ -227,7 +227,7 @@ Future testGET() async {
     var request =
         SyncHttpClient.getUrl(new Uri.http("localhost:$port", "/0123456789"));
     var response = request.close();
-    expect(HttpStatus.OK, equals(response.statusCode));
+    expect(HttpStatus.ok, equals(response.statusCode));
     expect(11, equals(response.contentLength));
     expect("01234567890", equals(response.body));
     testServerMain.close();
@@ -251,7 +251,7 @@ Future testPOST() async {
           SyncHttpClient.postUrl(new Uri.http("localhost:$port", "/echo"));
       request.write(data);
       var response = request.close();
-      expect(HttpStatus.OK, equals(response.statusCode));
+      expect(HttpStatus.ok, equals(response.statusCode));
       expect(data, equals(response.body));
       count++;
       if (count < kMessageCount) {
@@ -274,10 +274,10 @@ Future test404() async {
   Completer completer = new Completer();
   TestServerMain testServerMain = new TestServerMain();
   testServerMain.setServerStartedHandler((int port) {
-    var request = SyncHttpClient
-        .getUrl(new Uri.http("localhost:$port", "/thisisnotfound"));
+    var request = SyncHttpClient.getUrl(
+        new Uri.http("localhost:$port", "/thisisnotfound"));
     var response = request.close();
-    expect(HttpStatus.NOT_FOUND, equals(response.statusCode));
+    expect(HttpStatus.notFound, equals(response.statusCode));
     expect("Page not found", equals(response.body));
     testServerMain.close();
     completer.complete();
@@ -290,10 +290,10 @@ Future testReasonPhrase() async {
   Completer completer = new Completer();
   TestServerMain testServerMain = new TestServerMain();
   testServerMain.setServerStartedHandler((int port) {
-    var request = SyncHttpClient
-        .getUrl(new Uri.http("localhost:$port", "/reasonformoving"));
+    var request = SyncHttpClient.getUrl(
+        new Uri.http("localhost:$port", "/reasonformoving"));
     var response = request.close();
-    expect(HttpStatus.MOVED_PERMANENTLY, equals(response.statusCode));
+    expect(HttpStatus.movedPermanently, equals(response.statusCode));
     expect(
         "Don't come looking here any more\r\n", equals(response.reasonPhrase));
     testServerMain.close();
@@ -312,7 +312,7 @@ Future testHuge() async {
     var response = request.close();
     String expected =
         new List<int>.generate((1 << 20), (i) => (i + 1) % 256).toString();
-    expect(HttpStatus.OK, equals(response.statusCode));
+    expect(HttpStatus.ok, equals(response.statusCode));
     expect(expected.length, equals(response.contentLength));
     expect(expected.toString(), equals(response.body));
     testServerMain.close();

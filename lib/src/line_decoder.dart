@@ -42,7 +42,7 @@ class _LineDecoder {
   }
 
   void _process(List<int> line) =>
-      _callback(UTF8.decoder.convert(line), line.length, this);
+      _callback(utf8.decoder.convert(line), line.length, this);
 
   int get bufferedBytes => _unprocessedBytes.length;
 
