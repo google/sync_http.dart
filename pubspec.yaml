@@ -1,11 +1,11 @@
 name: sync_http
-version: 0.1.2-dev
+version: 0.1.2
 author: Dart Team <misc@dartlang.org>
 description: Synchronous HTTP client for Dart.
 homepage: https://github.com/dart-lang/sync_http
 
 environment:
-  sdk: '>=2.0.0-dev.64 <2.0.0'
+  sdk: '>=2.0.0-dev.63 <2.0.0'
 
 dev_dependencies:
   test: ^1.2.0
