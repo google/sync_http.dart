@@ -93,7 +93,8 @@ class SyncHttpClientRequest {
       queryString = query.toString().substring(0, query.length - 1);
     }
     StringBuffer buffer = new StringBuffer();
-    buffer.write('$method ${uri.path}${queryString} HTTP/$_protocolVersion\r\n');
+    buffer
+        .write('$method ${uri.path}${queryString} HTTP/$_protocolVersion\r\n');
     headers.forEach((name, values) {
       values.forEach((value) {
         buffer.write('$name: $value\r\n');

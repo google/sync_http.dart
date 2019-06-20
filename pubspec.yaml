@@ -1,5 +1,5 @@
 name: sync_http
-version: 0.1.3
+version: 0.1.4
 author: Dart Team <misc@dartlang.org>
 description: Synchronous HTTP client for Dart.
 homepage: https://github.com/dart-lang/sync_http
