@@ -80,8 +80,20 @@ class SyncHttpClientRequest {
 
   /// Send the HTTP request and get the response.
   SyncHttpClientResponse close() {
+    String queryString = "";
+    if (uri.hasQuery) {
+      StringBuffer query = new StringBuffer();
+      query.write('?');
+      uri.queryParameters.forEach((k, v) {
+        query.write(Uri.encodeComponent(k));
+        query.write('=');
+        query.write(Uri.encodeComponent(v));
+        query.write('&');
+      });
+      queryString = query.toString().substring(0, query.length - 1);
+    }
     StringBuffer buffer = new StringBuffer();
-    buffer.write('$method ${uri.path} HTTP/$_protocolVersion\r\n');
+    buffer.write('$method ${uri.path}${queryString} HTTP/$_protocolVersion\r\n');
     headers.forEach((name, values) {
       values.forEach((value) {
         buffer.write('$name: $value\r\n');
