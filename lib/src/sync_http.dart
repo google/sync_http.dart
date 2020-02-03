@@ -149,7 +149,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
 
   /// Add [value] to the list of values associated with header [name].
   @override
-  void add(String name, Object value) {
+  void add(String name, Object value, {bool preserveHeaderCase = false}) {
     switch (name) {
       case HttpHeaders.acceptCharsetHeader:
       case HttpHeaders.acceptEncodingHeader:
@@ -222,9 +222,9 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
 
   /// Replace values associated with key [name] with [value].
   @override
-  void set(String name, Object value) {
+  void set(String name, Object value, {bool preserveHeaderCase = false}) {
     removeAll(name);
-    add(name, value);
+    add(name, value, preserveHeaderCase: preserveHeaderCase);
   }
 
   /// Returns the values associated with key [name], if it exists, otherwise
@@ -449,7 +449,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   List<String> operator [](String name) => _headers[name];
 
   @override
-  void add(String name, Object value) {
+  void add(String name, Object value, {bool preserveHeaderCase = false}) {
     throw new UnsupportedError('Response headers are immutable');
   }
 
@@ -586,7 +586,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  void set(String name, Object value) {
+  void set(String name, Object value, {bool preserveHeaderCase = false}) {
     throw new UnsupportedError('Response headers are immutable');
   }
 
