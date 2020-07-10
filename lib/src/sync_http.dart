@@ -263,7 +263,10 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   }
 
   @override
-  bool get chunkedTransferEncoding => null;
+  bool get chunkedTransferEncoding {
+    return value(HttpHeaders.transferEncodingHeader)?.toLowerCase() ==
+        'chunked';
+  }
 
   @override
   void set chunkedTransferEncoding(bool _chunkedTransferEncoding) {
@@ -454,7 +457,10 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  bool get chunkedTransferEncoding => null;
+  bool get chunkedTransferEncoding {
+    return value(HttpHeaders.transferEncodingHeader)?.toLowerCase() ==
+        'chunked';
+  }
 
   @override
   void set chunkedTransferEncoding(bool _chunkedTransferEncoding) {
