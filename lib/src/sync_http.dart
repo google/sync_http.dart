@@ -32,8 +32,8 @@ abstract class SyncHttpClient {
 class SyncHttpClientRequest {
   static const String _protocolVersion = '1.1';
 
-  /// The length of the request body. Is set to null when no body exists.
-  int get contentLength => hasBody ? _body.length : null;
+  /// The length of the request body. Is set to `-1` when no body exists.
+  int get contentLength => hasBody ? _body.length : -1;
 
   HttpHeaders _headers;
 
@@ -471,9 +471,12 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   int get contentLength {
     String val = value(HttpHeaders.contentLengthHeader);
     if (val != null) {
-      return int.tryParse(val);
+      var parsed = int.tryParse(val);
+      if (parsed != null) {
+        return parsed;
+      }
     }
-    return null;
+    return -1;
   }
 
   @override
