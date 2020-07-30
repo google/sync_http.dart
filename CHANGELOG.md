@@ -1,3 +1,10 @@
+## v0.3.0
+
+* The `SyncHttpClientResponse.contentLength` getter will return `-1` instead of
+  `null` if content length not specified.
+
+* Implement `chunkedTransferEncoding` getters.
+
 ## v0.2.0
 
 * Preparation for [HttpHeaders change]. Update signature of `add()`
