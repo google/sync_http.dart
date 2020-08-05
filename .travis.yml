@@ -5,12 +5,26 @@ os:
   - osx
 
 dart:
+  - 2.0.0
   - dev
 
 dart_task:
-  - test: -p vm
-  - dartfmt
-  - dartanalyzer: --fatal-warnings --fatal-hints .
+  - test
+
+matrix:
+  include:
+  # Only validate formatting using the dev release
+  - dart: dev
+    os: linux
+    dart_task: dartfmt
+  - dart: dev
+    os: linux
+    dart_task:
+      dartanalyzer: --fatal-infos --fatal-warnings .
+  - dart: 2.0.0
+    os: linux
+    dart_task:
+      dartanalyzer: --fatal-warnings .
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
