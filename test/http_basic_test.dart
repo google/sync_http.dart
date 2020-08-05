@@ -142,8 +142,8 @@ class TestServer {
   void _hostHandler(HttpRequest request) {
     var response = request.response;
     expect(1, equals(request.headers["Host"].length));
-    expect("www.dartlang.org:1234", equals(request.headers["Host"][0]));
-    expect("www.dartlang.org", equals(request.headers.host));
+    expect("dart.dev:1234", equals(request.headers["Host"][0]));
+    expect("dart.dev", equals(request.headers.host));
     expect(1234, equals(request.headers.port));
     response.statusCode = HttpStatus.ok;
     response.close();

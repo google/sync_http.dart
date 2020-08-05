@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/dart-lang/sync_http.svg?branch=master)](https://travis-ci.org/dart-lang/sync_http/)
-[![pub package](https://img.shields.io/pub/v/sync_http.svg)](https://pub.dartlang.org/packages/sync_http)
+[![pub package](https://img.shields.io/pub/v/sync_http.svg)](https://pub.dev/packages/sync_http)
 
 A simple Dart HTTP client implemented using RawSynchronousSockets to allow for
 synchronous HTTP requests.
@@ -11,6 +11,6 @@ can process no other events while waiting for the server to respond. As such,
 this synchronous HTTP client library is not suitable for applications that
 require high performance. Instead, such applications should use libraries built
 on asynchronous I/O, including
-[dart:io](https://api.dartlang.org/stable/1.24.3/dart-io/dart-io-library.html)
-and [package:http](https://pub.dartlang.org/packages/http), for the best 
+[dart:io](https://api.dart.dev/stable/dart-io/dart-io-library.html)
+and [package:http](https://pub.dev/packages/http), for the best 
 performance.
