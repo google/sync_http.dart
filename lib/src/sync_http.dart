@@ -38,12 +38,8 @@ class SyncHttpClientRequest {
   HttpHeaders _headers;
 
   /// The headers associated with the HTTP request.
-  HttpHeaders get headers {
-    if (_headers == null) {
-      _headers = new _SyncHttpClientRequestHeaders(this);
-    }
-    return _headers;
-  }
+  HttpHeaders get headers =>
+      _headers ??= new _SyncHttpClientRequestHeaders(this);
 
   /// The type of HTTP request being made.
   final String method;
@@ -110,7 +106,7 @@ class SyncHttpClientRequest {
 }
 
 class _SyncHttpClientRequestHeaders implements HttpHeaders {
-  Map<String, List> _headers = <String, List<String>>{};
+  final Map<String, List<String>> _headers = <String, List<String>>{};
 
   final SyncHttpClientRequest _request;
   ContentType contentType;
@@ -431,15 +427,14 @@ class SyncHttpClientResponse {
       }
     }
 
-    return new SyncHttpClientResponse._(
+    return new SyncHttpClientResponse._(headers,
         reasonPhrase: reasonPhrase,
         statusCode: statusCode,
-        body: body.toString(),
-        headers: headers);
+        body: body.toString());
   }
 
-  SyncHttpClientResponse._(
-      {this.reasonPhrase, this.statusCode, this.body, headers})
+  SyncHttpClientResponse._(Map<String, List<String>> headers,
+      {this.reasonPhrase, this.statusCode, this.body})
       : this.headers = new _SyncHttpClientResponseHeaders(headers);
 }
 
