@@ -26,7 +26,7 @@ class TestServerMain {
     ReceivePort receivePort = new ReceivePort();
     Isolate.spawn(startTestServer, receivePort.sendPort);
     receivePort.first.then((port) {
-      _serverPort = port;
+      _serverPort = port /*!*/;
 
       // Send server start message to the server.
       var command = new TestServerCommand.start();
@@ -176,7 +176,7 @@ class TestServer {
 
   dispatch(var message) async {
     TestServerCommand command = message[0];
-    SendPort replyTo = message[1];
+    SendPort replyTo = message[1] /*!*/;
     if (command.isStart) {
       try {
         var addr = (await InternetAddress.lookup("localhost"))[0];
