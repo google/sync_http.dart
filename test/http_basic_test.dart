@@ -9,14 +9,14 @@ import "dart:isolate";
 import "package:sync_http/sync_http.dart";
 import "package:test/test.dart";
 
-typedef void ServerCallback(int port);
+typedef void ServerCallback(int? port);
 
 class TestServerMain {
   TestServerMain() : _statusPort = new ReceivePort();
 
   ReceivePort _statusPort; // Port for receiving messages from the server.
-  SendPort _serverPort; // Port for sending messages to the server.
-  ServerCallback _startedCallback;
+  late SendPort _serverPort; // Port for sending messages to the server.
+  late ServerCallback _startedCallback;
 
   void setServerStartedHandler(ServerCallback startedCallback) {
     _startedCallback = startedCallback;
@@ -26,7 +26,7 @@ class TestServerMain {
     ReceivePort receivePort = new ReceivePort();
     Isolate.spawn(startTestServer, receivePort.sendPort);
     receivePort.first.then((port) {
-      _serverPort = port /*!*/;
+      _serverPort = port!;
 
       // Send server start message to the server.
       var command = new TestServerCommand.start();
@@ -78,10 +78,10 @@ class TestServerStatus {
   bool get isStopped => (_state == TestServerStatusState.stopped);
   bool get isError => (_state == TestServerStatusState.error);
 
-  int get port => _port;
+  int? get port => _port;
 
   TestServerStatusState _state;
-  int _port;
+  int? _port;
 }
 
 void startTestServer(SendPort replyTo) {
@@ -141,8 +141,8 @@ class TestServer {
   // Check the "Host" header.
   void _hostHandler(HttpRequest request) {
     var response = request.response;
-    expect(1, equals(request.headers["Host"].length));
-    expect("dart.dev:1234", equals(request.headers["Host"][0]));
+    expect(1, equals(request.headers["Host"]!.length));
+    expect("dart.dev:1234", equals(request.headers["Host"]![0]));
     expect("dart.dev", equals(request.headers.host));
     expect(1234, equals(request.headers.port));
     response.statusCode = HttpStatus.ok;
@@ -176,7 +176,7 @@ class TestServer {
 
   dispatch(var message) async {
     TestServerCommand command = message[0];
-    SendPort replyTo = message[1] /*!*/;
+    SendPort replyTo = message[1]!;
     if (command.isStart) {
       try {
         var addr = (await InternetAddress.lookup("localhost"))[0];
@@ -204,15 +204,15 @@ class TestServer {
     }
   }
 
-  HttpServer _server; // HTTP server instance.
-  ReceivePort _dispatchPort;
-  Map _requestHandlers;
+  late HttpServer _server; // HTTP server instance.
+  late ReceivePort _dispatchPort;
+  late Map _requestHandlers;
 }
 
 Future testStartStop() async {
   Completer completer = new Completer();
   TestServerMain testServerMain = new TestServerMain();
-  testServerMain.setServerStartedHandler((int port) {
+  testServerMain.setServerStartedHandler((int? port) {
     testServerMain.close();
     completer.complete();
   });
@@ -223,7 +223,7 @@ Future testStartStop() async {
 Future testGET() async {
   Completer completer = new Completer();
   TestServerMain testServerMain = new TestServerMain();
-  testServerMain.setServerStartedHandler((int port) {
+  testServerMain.setServerStartedHandler((int? port) {
     var request =
         SyncHttpClient.getUrl(new Uri.http("localhost:$port", "/0123456789"));
     var response = request.close();
@@ -244,7 +244,7 @@ Future testPOST() async {
 
   TestServerMain testServerMain = new TestServerMain();
 
-  void runTest(int port) {
+  void runTest(int? port) {
     int count = 0;
     void sendRequest() {
       var request =
@@ -273,7 +273,7 @@ Future testPOST() async {
 Future test404() async {
   Completer completer = new Completer();
   TestServerMain testServerMain = new TestServerMain();
-  testServerMain.setServerStartedHandler((int port) {
+  testServerMain.setServerStartedHandler((int? port) {
     var request = SyncHttpClient.getUrl(
         new Uri.http("localhost:$port", "/thisisnotfound"));
     var response = request.close();
@@ -289,7 +289,7 @@ Future test404() async {
 Future testReasonPhrase() async {
   Completer completer = new Completer();
   TestServerMain testServerMain = new TestServerMain();
-  testServerMain.setServerStartedHandler((int port) {
+  testServerMain.setServerStartedHandler((int? port) {
     var request = SyncHttpClient.getUrl(
         new Uri.http("localhost:$port", "/reasonformoving"));
     var response = request.close();
@@ -306,7 +306,7 @@ Future testReasonPhrase() async {
 Future testHuge() async {
   Completer completer = new Completer();
   TestServerMain testServerMain = new TestServerMain();
-  testServerMain.setServerStartedHandler((int port) {
+  testServerMain.setServerStartedHandler((int? port) {
     var request =
         SyncHttpClient.getUrl(new Uri.http("localhost:$port", "/huge"));
     var response = request.close();
