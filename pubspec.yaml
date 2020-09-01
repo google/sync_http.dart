@@ -3,8 +3,12 @@ version: 0.3.0-dev
 description: Synchronous HTTP client for Dart.
 homepage: https://github.com/dart-lang/sync_http
 
+# We are not ready to publish NNBD packages yet.
+publish_to: none
+
 environment:
-  sdk: '>=2.10.0 <2.11.0'
+  # This must remain a tight constraint until nnbd is stable.
+  sdk: '>=2.10.0-0 <2.10.0'
 
 dev_dependencies:
   test: ^1.2.0
