@@ -33,9 +33,9 @@ class SyncHttpClientRequest {
   static const String _protocolVersion = '1.1';
 
   /// The length of the request body. Is set to `-1` when no body exists.
-  int get contentLength => hasBody ? _body.length : -1;
+  int get contentLength => hasBody ? _body!.length : -1;
 
-  HttpHeaders _headers;
+  HttpHeaders? _headers;
 
   /// The headers associated with the HTTP request.
   HttpHeaders get headers =>
@@ -52,7 +52,7 @@ class SyncHttpClientRequest {
 
   /// The body of the HTTP request. This can be empty if there is no body
   /// associated with the request.
-  final BytesBuilder _body;
+  final BytesBuilder? _body;
 
   /// The synchronous socket used to initiate the HTTP request.
   final RawSynchronousSocket _socket;
@@ -65,7 +65,7 @@ class SyncHttpClientRequest {
   /// Write content into the body of the HTTP request.
   void write(Object obj) {
     if (hasBody) {
-      _body.add(encoding.encoder.convert(obj.toString()));
+      _body!.add(encoding.encoder.convert(obj.toString()));
     } else {
       throw new StateError('write not allowed for method $method');
     }
@@ -98,7 +98,7 @@ class SyncHttpClientRequest {
     });
     buffer.write('\r\n');
     if (hasBody) {
-      buffer.write(new String.fromCharCodes(_body.takeBytes()));
+      buffer.write(new String.fromCharCodes(_body!.takeBytes()));
     }
     _socket.writeFromSync(buffer.toString().codeUnits);
     return new SyncHttpClientResponse(_socket);
@@ -109,12 +109,12 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   final Map<String, List<String>> _headers = <String, List<String>>{};
 
   final SyncHttpClientRequest _request;
-  ContentType contentType;
+  ContentType? contentType;
 
   _SyncHttpClientRequestHeaders(this._request);
 
   @override
-  List<String> operator [](String name) {
+  List<String>? operator [](String name) {
     switch (name) {
       case HttpHeaders.acceptCharsetHeader:
         return ['utf-8'];
@@ -157,13 +157,13 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
       case HttpHeaders.hostHeader:
         throw new UnsupportedError('Unsupported or immutable property: $name');
       case HttpHeaders.contentTypeHeader:
-        contentType = value;
+        contentType = value as ContentType?;
         break;
       default:
         if (_headers[name] == null) {
           _headers[name] = <String>[];
         }
-        _headers[name].add(value);
+        _headers[name]!.add(value as String);
     }
   }
 
@@ -187,8 +187,8 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
         break;
       default:
         if (_headers[name] != null) {
-          _headers[name].remove(value);
-          if (_headers[name].isEmpty) {
+          _headers[name]!.remove(value);
+          if (_headers[name]!.isEmpty) {
             _headers.remove(name);
           }
         }
@@ -226,7 +226,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   /// Returns the values associated with key [name], if it exists, otherwise
   /// returns null.
   @override
-  String value(String name) {
+  String? value(String name) {
     var val = this[name];
     if (val == null || val.isEmpty) {
       return null;
@@ -278,23 +278,23 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   }
 
   @override
-  void set date(DateTime _date) {
+  void set date(DateTime? _date) {
     throw new UnsupportedError('date is unsupported');
   }
 
   @override
-  DateTime get date => null;
+  DateTime? get date => null;
 
   @override
-  void set expires(DateTime _expires) {
+  void set expires(DateTime? _expires) {
     throw new UnsupportedError('expires is unsupported');
   }
 
   @override
-  DateTime get expires => null;
+  DateTime? get expires => null;
 
   @override
-  void set host(String _host) {
+  void set host(String? _host) {
     throw new UnsupportedError('host is automatically set');
   }
 
@@ -302,10 +302,10 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   String get host => _request.uri.host;
 
   @override
-  DateTime get ifModifiedSince => null;
+  DateTime? get ifModifiedSince => null;
 
   @override
-  void set ifModifiedSince(DateTime _ifModifiedSince) {
+  void set ifModifiedSince(DateTime? _ifModifiedSince) {
     throw new UnsupportedError('if modified since is unsupported');
   }
 
@@ -323,7 +323,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   }
 
   @override
-  void set port(int _port) {
+  void set port(int? _port) {
     throw new UnsupportedError('port is automatically set');
   }
 
@@ -348,19 +348,19 @@ class SyncHttpClientResponse {
 
   /// A short textual description of the status code associated with the HTTP
   /// response.
-  final String reasonPhrase;
+  final String? reasonPhrase;
 
   /// The resulting HTTP status code associated with the HTTP response.
-  final int statusCode;
+  final int? statusCode;
 
   /// The body of the HTTP response.
-  final String body;
+  final String? body;
 
   /// Creates an instance of [SyncHttpClientResponse] that contains the response
   /// sent by the HTTP server over [socket].
   factory SyncHttpClientResponse(RawSynchronousSocket socket) {
-    int statusCode;
-    String reasonPhrase;
+    int? statusCode;
+    String? reasonPhrase;
     StringBuffer body = new StringBuffer();
     Map<String, List<String>> headers = {};
 
@@ -395,7 +395,7 @@ class SyncHttpClientResponse {
         if (!headers.containsKey(name)) {
           headers[name] = [];
         }
-        headers[name].add(value);
+        headers[name]!.add(value);
       } else if (line.startsWith('HTTP/1.1') || line.startsWith('HTTP/1.0')) {
         statusCode = int.parse(
             line.substring('HTTP/1.x '.length, 'HTTP/1.x xxx'.length));
@@ -444,7 +444,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   _SyncHttpClientResponseHeaders(this._headers);
 
   @override
-  List<String> operator [](String name) => _headers[name];
+  List<String>? operator [](String name) => _headers[name];
 
   @override
   void add(String name, Object value, {bool preserveHeaderCase = false}) {
@@ -464,7 +464,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   int get contentLength {
-    String val = value(HttpHeaders.contentLengthHeader);
+    String? val = value(HttpHeaders.contentLengthHeader);
     if (val != null) {
       var parsed = int.tryParse(val);
       if (parsed != null) {
@@ -480,7 +480,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  ContentType get contentType {
+  ContentType? get contentType {
     var val = value(HttpHeaders.contentTypeHeader);
     if (val != null) {
       return ContentType.parse(val);
@@ -489,17 +489,17 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  void set contentType(ContentType _contentType) {
+  void set contentType(ContentType? _contentType) {
     throw new UnsupportedError('Response headers are immutable');
   }
 
   @override
-  void set date(DateTime _date) {
+  void set date(DateTime? _date) {
     throw new UnsupportedError('Response headers are immutable');
   }
 
   @override
-  DateTime get date {
+  DateTime? get date {
     var val = value(HttpHeaders.dateHeader);
     if (val != null) {
       return DateTime.parse(val);
@@ -508,12 +508,12 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  void set expires(DateTime _expires) {
+  void set expires(DateTime? _expires) {
     throw new UnsupportedError('Response headers are immutable');
   }
 
   @override
-  DateTime get expires {
+  DateTime? get expires {
     var val = value(HttpHeaders.expiresHeader);
     if (val != null) {
       return DateTime.parse(val);
@@ -525,12 +525,12 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   void forEach(void f(String name, List<String> values)) => _headers.forEach(f);
 
   @override
-  void set host(String _host) {
+  void set host(String? _host) {
     throw new UnsupportedError('Response headers are immutable');
   }
 
   @override
-  String get host {
+  String? get host {
     var val = value(HttpHeaders.hostHeader);
     if (val != null) {
       return Uri.parse(val).host;
@@ -539,7 +539,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  DateTime get ifModifiedSince {
+  DateTime? get ifModifiedSince {
     var val = value(HttpHeaders.ifModifiedSinceHeader);
     if (val != null) {
       return DateTime.parse(val);
@@ -548,7 +548,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  void set ifModifiedSince(DateTime _ifModifiedSince) {
+  void set ifModifiedSince(DateTime? _ifModifiedSince) {
     throw new UnsupportedError('Response headers are immutable');
   }
 
@@ -566,12 +566,12 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  void set port(int _port) {
+  void set port(int? _port) {
     throw new UnsupportedError('Response headers are immutable');
   }
 
   @override
-  int get port {
+  int? get port {
     var val = value(HttpHeaders.hostHeader);
     if (val != null) {
       return Uri.parse(val).port;
@@ -595,7 +595,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  String value(String name) {
+  String? value(String name) {
     var val = this[name];
     if (val == null || val.isEmpty) {
       return null;
