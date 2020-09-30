@@ -1,5 +1,5 @@
 name: sync_http
-version: 0.3.0-dev
+version: 0.3.0-nullsafety-dev
 description: Synchronous HTTP client for Dart.
 homepage: https://github.com/dart-lang/sync_http
 
@@ -8,7 +8,7 @@ publish_to: none
 
 environment:
   # This must remain a tight constraint until nnbd is stable.
-  sdk: '>=2.10.0-0 <2.10.0'
+  sdk: '>=2.10.0-0 <2.11.0'
 
 dev_dependencies:
   test: ^1.2.0

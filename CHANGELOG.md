@@ -1,4 +1,4 @@
-## v0.3.0
+## v0.3.0-nullsafety-dev
 
 * The `SyncHttpClientResponse.contentLength` getter will return `-1` instead of
   `null` if content length not specified.
