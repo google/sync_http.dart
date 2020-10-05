@@ -63,9 +63,11 @@ class SyncHttpClientRequest {
         this._socket = RawSynchronousSocket.connectSync(uri.host, uri.port);
 
   /// Write content into the body of the HTTP request.
-  void write(Object obj) {
+  void write(Object? obj) {
     if (hasBody) {
-      _body!.add(encoding.encoder.convert(obj.toString()));
+      if (obj != null) {
+        _body!.add(encoding.encoder.convert(obj.toString()));
+      }
     } else {
       throw new StateError('write not allowed for method $method');
     }
