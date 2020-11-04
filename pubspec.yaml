@@ -7,7 +7,6 @@ homepage: https://github.com/dart-lang/sync_http
 publish_to: none
 
 environment:
-  # This must remain a tight constraint until nnbd is stable.
   sdk: '>=2.12.0-0 <3.0.0'
 
 dev_dependencies:
