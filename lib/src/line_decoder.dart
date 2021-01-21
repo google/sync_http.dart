@@ -7,11 +7,11 @@ part of sync.http;
 // '\n' character
 const int _lineTerminator = 10;
 
-typedef void _LineDecoderCallback(
+typedef _LineDecoderCallback = void Function(
     String line, int bytesRead, _LineDecoder decoder);
 
 class _LineDecoder {
-  BytesBuilder _unprocessedBytes = new BytesBuilder();
+  final BytesBuilder _unprocessedBytes = BytesBuilder();
 
   int expectedByteCount = -1;
 
@@ -21,7 +21,7 @@ class _LineDecoder {
 
   void add(List<int> chunk) {
     while (chunk.isNotEmpty) {
-      int splitIndex = -1;
+      var splitIndex = -1;
 
       if (expectedByteCount > 0) {
         splitIndex = expectedByteCount - _unprocessedBytes.length;
