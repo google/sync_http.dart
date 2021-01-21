@@ -1,6 +1,6 @@
 ## v0.3.0-nullsafety.0
 
-* **BREAKING** `SyncHttpClient` functions now require the `url` paramater to be
+* **BREAKING** `SyncHttpClient` functions now require the `url` parameter to be
   `Uri`. Previously, both `Uri` and `String` were supported.
 
 * The `SyncHttpClientResponse.contentLength` getter will return `-1` instead of
