@@ -2,19 +2,19 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import "dart:async";
-import "dart:io";
-import "dart:isolate";
+import 'dart:async';
+import 'dart:io';
+import 'dart:isolate';
 
-import "package:sync_http/sync_http.dart";
-import "package:test/test.dart";
+import 'package:sync_http/sync_http.dart';
+import 'package:test/test.dart';
 
-typedef void ServerCallback(int? port);
+typedef ServerCallback = void Function(int? port);
 
 class TestServerMain {
-  TestServerMain() : _statusPort = new ReceivePort();
+  TestServerMain() : _statusPort = ReceivePort();
 
-  ReceivePort _statusPort; // Port for receiving messages from the server.
+  final ReceivePort _statusPort; // Port for receiving messages from the server.
   late SendPort _serverPort; // Port for sending messages to the server.
   late ServerCallback _startedCallback;
 
@@ -23,18 +23,19 @@ class TestServerMain {
   }
 
   void start() {
-    ReceivePort receivePort = new ReceivePort();
+    var receivePort = ReceivePort();
     Isolate.spawn(startTestServer, receivePort.sendPort);
     receivePort.first.then((port) {
-      _serverPort = port!;
+      _serverPort = port as SendPort;
 
       // Send server start message to the server.
-      var command = new TestServerCommand.start();
+      var command = TestServerCommand.start();
       port.send([command, _statusPort.sendPort]);
     });
 
     // Handle status messages from the server.
-    _statusPort.listen((var status) {
+    _statusPort.listen((var value) {
+      var status = value as TestServerStatus;
       if (status.isStarted) {
         _startedCallback(status.port);
       }
@@ -43,7 +44,7 @@ class TestServerMain {
 
   void close() {
     // Send server stop message to the server.
-    _serverPort.send([new TestServerCommand.stop(), _statusPort.sendPort]);
+    _serverPort.send([TestServerCommand.stop(), _statusPort.sendPort]);
     _statusPort.close();
   }
 }
@@ -55,12 +56,14 @@ enum TestServerCommandState {
 
 class TestServerCommand {
   TestServerCommand.start() : _command = TestServerCommandState.start;
+
   TestServerCommand.stop() : _command = TestServerCommandState.stop;
 
-  bool get isStart => (_command == TestServerCommandState.start);
-  bool get isStop => (_command == TestServerCommandState.stop);
+  bool get isStart => _command == TestServerCommandState.start;
 
-  TestServerCommandState _command;
+  bool get isStop => _command == TestServerCommandState.stop;
+
+  final TestServerCommandState _command;
 }
 
 enum TestServerStatusState {
@@ -71,21 +74,25 @@ enum TestServerStatusState {
 
 class TestServerStatus {
   TestServerStatus.started(this._port) : _state = TestServerStatusState.started;
+
   TestServerStatus.stopped() : _state = TestServerStatusState.stopped;
+
   TestServerStatus.error() : _state = TestServerStatusState.error;
 
-  bool get isStarted => (_state == TestServerStatusState.started);
-  bool get isStopped => (_state == TestServerStatusState.stopped);
-  bool get isError => (_state == TestServerStatusState.error);
+  bool get isStarted => _state == TestServerStatusState.started;
+
+  bool get isStopped => _state == TestServerStatusState.stopped;
+
+  bool get isError => _state == TestServerStatusState.error;
 
   int? get port => _port;
 
-  TestServerStatusState _state;
+  final TestServerStatusState _state;
   int? _port;
 }
 
 void startTestServer(SendPort replyTo) {
-  var server = new TestServer();
+  var server = TestServer();
   server.init();
   replyTo.send(server.dispatchSendPort);
 }
@@ -94,13 +101,13 @@ class TestServer {
   // Echo the request content back to the response.
   void _echoHandler(HttpRequest request) {
     var response = request.response;
-    if (request.method != "POST") {
+    if (request.method != 'POST') {
       response.close();
       return;
     }
     response.contentLength = request.contentLength;
     request.listen((List<int> data) {
-      var string = new String.fromCharCodes(data);
+      var string = String.fromCharCodes(data);
       response.write(string);
       response.close();
     });
@@ -109,8 +116,8 @@ class TestServer {
   // Echo the request content back to the response.
   void _zeroToTenHandler(HttpRequest request) {
     var response = request.response;
-    String msg = "01234567890";
-    if (request.method != "GET") {
+    var msg = '01234567890';
+    if (request.method != 'GET') {
       response.close();
       return;
     }
@@ -123,9 +130,9 @@ class TestServer {
   void _notFoundHandler(HttpRequest request) {
     var response = request.response;
     response.statusCode = HttpStatus.notFound;
-    String msg = "Page not found";
+    var msg = 'Page not found';
     response.contentLength = msg.length;
-    response.headers.set("Content-Type", "text/html; charset=UTF-8");
+    response.headers.set('Content-Type', 'text/html; charset=UTF-8');
     response.write(msg);
     response.close();
   }
@@ -141,9 +148,9 @@ class TestServer {
   // Check the "Host" header.
   void _hostHandler(HttpRequest request) {
     var response = request.response;
-    expect(1, equals(request.headers["Host"]!.length));
-    expect("dart.dev:1234", equals(request.headers["Host"]![0]));
-    expect("dart.dev", equals(request.headers.host));
+    expect(1, equals(request.headers['Host']!.length));
+    expect('dart.dev:1234', equals(request.headers['Host']![0]));
+    expect('dart.dev', equals(request.headers.host));
     expect(1234, equals(request.headers.port));
     response.statusCode = HttpStatus.ok;
     response.close();
@@ -151,9 +158,8 @@ class TestServer {
 
   void _hugeHandler(HttpRequest request) {
     var response = request.response;
-    List<int> expected =
-        new List<int>.generate((1 << 20), (i) => (i + 1) % 256);
-    String msg = expected.toString();
+    var expected = List<int>.generate(1 << 20, (i) => (i + 1) % 256);
+    var msg = expected.toString();
     response.contentLength = msg.length;
     response.statusCode = HttpStatus.ok;
     response.write(msg);
@@ -162,36 +168,36 @@ class TestServer {
 
   void init() {
     // Setup request handlers.
-    _requestHandlers = new Map();
-    _requestHandlers["/echo"] = _echoHandler;
-    _requestHandlers["/0123456789"] = _zeroToTenHandler;
-    _requestHandlers["/reasonformoving"] = _reasonForMovingHandler;
-    _requestHandlers["/host"] = _hostHandler;
-    _requestHandlers["/huge"] = _hugeHandler;
-    _dispatchPort = new ReceivePort();
+    _requestHandlers = {};
+    _requestHandlers['/echo'] = _echoHandler;
+    _requestHandlers['/0123456789'] = _zeroToTenHandler;
+    _requestHandlers['/reasonformoving'] = _reasonForMovingHandler;
+    _requestHandlers['/host'] = _hostHandler;
+    _requestHandlers['/huge'] = _hugeHandler;
+    _dispatchPort = ReceivePort();
     _dispatchPort.listen(dispatch);
   }
 
   SendPort get dispatchSendPort => _dispatchPort.sendPort;
 
-  dispatch(var message) async {
-    TestServerCommand command = message[0];
-    SendPort replyTo = message[1]!;
+  void dispatch(var message) async {
+    var command = (message as List)[0] as TestServerCommand;
+    var replyTo = message[1] as SendPort;
     if (command.isStart) {
       try {
-        var addr = (await InternetAddress.lookup("localhost"))[0];
-        HttpServer.bind(addr, 0).then((server) {
+        var addr = (await InternetAddress.lookup('localhost'))[0];
+        await HttpServer.bind(addr, 0).then((server) {
           _server = server;
           _server.listen(_requestReceivedHandler);
-          replyTo.send(new TestServerStatus.started(_server.port));
+          replyTo.send(TestServerStatus.started(_server.port));
         });
       } catch (e) {
-        replyTo.send(new TestServerStatus.error());
+        replyTo.send(TestServerStatus.error());
       }
     } else if (command.isStop) {
-      _server.close();
+      await _server.close();
       _dispatchPort.close();
-      replyTo.send(new TestServerStatus.stopped());
+      replyTo.send(TestServerStatus.stopped());
     }
   }
 
@@ -210,8 +216,8 @@ class TestServer {
 }
 
 Future testStartStop() async {
-  Completer completer = new Completer();
-  TestServerMain testServerMain = new TestServerMain();
+  var completer = Completer();
+  var testServerMain = TestServerMain();
   testServerMain.setServerStartedHandler((int? port) {
     testServerMain.close();
     completer.complete();
@@ -221,15 +227,15 @@ Future testStartStop() async {
 }
 
 Future testGET() async {
-  Completer completer = new Completer();
-  TestServerMain testServerMain = new TestServerMain();
+  var completer = Completer();
+  var testServerMain = TestServerMain();
   testServerMain.setServerStartedHandler((int? port) {
     var request =
-        SyncHttpClient.getUrl(new Uri.http("localhost:$port", "/0123456789"));
+        SyncHttpClient.getUrl(Uri.http('localhost:$port', '/0123456789'));
     var response = request.close();
     expect(HttpStatus.ok, equals(response.statusCode));
     expect(11, equals(response.contentLength));
-    expect("01234567890", equals(response.body));
+    expect('01234567890', equals(response.body));
     testServerMain.close();
     completer.complete();
   });
@@ -238,17 +244,17 @@ Future testGET() async {
 }
 
 Future testPOST() async {
-  Completer completer = new Completer();
-  String data = "ABCDEFGHIJKLMONPQRSTUVWXYZ";
-  final int kMessageCount = 10;
+  var completer = Completer();
+  var data = 'ABCDEFGHIJKLMONPQRSTUVWXYZ';
+  final kMessageCount = 10;
 
-  TestServerMain testServerMain = new TestServerMain();
+  var testServerMain = TestServerMain();
 
   void runTest(int? port) {
-    int count = 0;
+    var count = 0;
     void sendRequest() {
       var request =
-          SyncHttpClient.postUrl(new Uri.http("localhost:$port", "/echo"));
+          SyncHttpClient.postUrl(Uri.http('localhost:$port', '/echo'));
       request.write(data);
       var response = request.close();
       expect(HttpStatus.ok, equals(response.statusCode));
@@ -271,14 +277,14 @@ Future testPOST() async {
 }
 
 Future test404() async {
-  Completer completer = new Completer();
-  TestServerMain testServerMain = new TestServerMain();
+  var completer = Completer();
+  var testServerMain = TestServerMain();
   testServerMain.setServerStartedHandler((int? port) {
-    var request = SyncHttpClient.getUrl(
-        new Uri.http("localhost:$port", "/thisisnotfound"));
+    var request =
+        SyncHttpClient.getUrl(Uri.http('localhost:$port', '/thisisnotfound'));
     var response = request.close();
     expect(HttpStatus.notFound, equals(response.statusCode));
-    expect("Page not found", equals(response.body));
+    expect('Page not found', equals(response.body));
     testServerMain.close();
     completer.complete();
   });
@@ -287,11 +293,11 @@ Future test404() async {
 }
 
 Future testReasonPhrase() async {
-  Completer completer = new Completer();
-  TestServerMain testServerMain = new TestServerMain();
+  var completer = Completer();
+  var testServerMain = TestServerMain();
   testServerMain.setServerStartedHandler((int? port) {
-    var request = SyncHttpClient.getUrl(
-        new Uri.http("localhost:$port", "/reasonformoving"));
+    var request =
+        SyncHttpClient.getUrl(Uri.http('localhost:$port', '/reasonformoving'));
     var response = request.close();
     expect(HttpStatus.movedPermanently, equals(response.statusCode));
     expect(
@@ -304,14 +310,12 @@ Future testReasonPhrase() async {
 }
 
 Future testHuge() async {
-  Completer completer = new Completer();
-  TestServerMain testServerMain = new TestServerMain();
+  var completer = Completer();
+  var testServerMain = TestServerMain();
   testServerMain.setServerStartedHandler((int? port) {
-    var request =
-        SyncHttpClient.getUrl(new Uri.http("localhost:$port", "/huge"));
+    var request = SyncHttpClient.getUrl(Uri.http('localhost:$port', '/huge'));
     var response = request.close();
-    String expected =
-        new List<int>.generate((1 << 20), (i) => (i + 1) % 256).toString();
+    var expected = List<int>.generate(1 << 20, (i) => (i + 1) % 256).toString();
     expect(HttpStatus.ok, equals(response.statusCode));
     expect(expected.length, equals(response.contentLength));
     expect(expected.toString(), equals(response.body));
@@ -323,22 +327,22 @@ Future testHuge() async {
 }
 
 void main() {
-  test("Simple server test", () async {
+  test('Simple server test', () async {
     await testStartStop();
   });
-  test("Sync HTTP GET test", () async {
+  test('Sync HTTP GET test', () async {
     await testGET();
   });
-  test("Sync HTTP POST test", () async {
+  test('Sync HTTP POST test', () async {
     await testPOST();
   });
-  test("Sync HTTP 404 test", () async {
+  test('Sync HTTP 404 test', () async {
     await test404();
   });
-  test("Sync HTTP moved test", () async {
+  test('Sync HTTP moved test', () async {
     await testReasonPhrase();
   });
-  test("Sync HTTP huge test", () async {
+  test('Sync HTTP huge test', () async {
     await testHuge();
   });
 }
