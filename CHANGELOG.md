@@ -1,3 +1,8 @@
+## v0.3.1
+
+* Switch to using `package:lints/recommended.yaml`
+* Update the usage guidance in the readme.
+
 ## v0.3.0
 
 * Stable version for null safety.
