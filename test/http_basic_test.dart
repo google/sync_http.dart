@@ -97,6 +97,8 @@ void startTestServer(SendPort replyTo) {
   replyTo.send(server.dispatchSendPort);
 }
 
+typedef _RequestHandler = void Function(HttpRequest request);
+
 class TestServer {
   // Echo the request content back to the response.
   void _echoHandler(HttpRequest request) {
@@ -212,7 +214,7 @@ class TestServer {
 
   late HttpServer _server; // HTTP server instance.
   late ReceivePort _dispatchPort;
-  late Map _requestHandlers;
+  late Map<String, _RequestHandler> _requestHandlers;
 }
 
 Future testStartStop() async {

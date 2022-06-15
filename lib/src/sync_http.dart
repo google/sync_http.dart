@@ -56,9 +56,8 @@ class SyncHttpClientRequest {
   /// The synchronous socket used to initiate the HTTP request.
   final RawSynchronousSocket _socket;
 
-  SyncHttpClientRequest._(this.method, Uri uri, bool body)
-      : uri = uri,
-        _body = body ? BytesBuilder() : null,
+  SyncHttpClientRequest._(this.method, this.uri, bool body)
+      : _body = body ? BytesBuilder() : null,
         _socket = RawSynchronousSocket.connectSync(uri.host, uri.port);
 
   /// Write content into the body of the HTTP request.
@@ -92,9 +91,9 @@ class SyncHttpClientRequest {
     var buffer = StringBuffer();
     buffer.write('$method ${uri.path}$queryString HTTP/$_protocolVersion\r\n');
     headers.forEach((name, values) {
-      values.forEach((value) {
+      for (var value in values) {
         buffer.write('$name: $value\r\n');
-      });
+      }
     });
     buffer.write('\r\n');
     if (hasBody) {
@@ -241,12 +240,12 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   /// Iterates over all header key-value pairs and applies [f].
   @override
   void forEach(void Function(String name, List<String> values) f) {
-    var forEachFunc = (String name) {
+    void forEachFunc(String name) {
       var values = this[name];
       if (values != null && values.isNotEmpty) {
         f(name, values);
       }
-    };
+    }
 
     [
       HttpHeaders.acceptCharsetHeader,
