@@ -6,12 +6,8 @@ library sync.http;
 
 import 'dart:convert';
 import 'dart:io'
-    show
-        BytesBuilder,
-        ContentType,
-        HttpException,
-        HttpHeaders,
-        RawSynchronousSocket;
+    show ContentType, HttpException, HttpHeaders, RawSynchronousSocket;
+import 'dart:typed_data' show BytesBuilder;
 
-part 'src/sync_http.dart';
 part 'src/line_decoder.dart';
+part 'src/sync_http.dart';
