@@ -7,15 +7,12 @@ part of sync.http;
 // '\n' character
 const int _lineTerminator = 10;
 
-typedef _LineDecoderCallback = void Function(
-    String line, int bytesRead, _LineDecoder decoder);
-
 class _LineDecoder {
   final BytesBuilder _unprocessedBytes = BytesBuilder();
 
   int expectedByteCount = -1;
 
-  final _LineDecoderCallback _callback;
+  final void Function(String, int, _LineDecoder) _callback;
 
   _LineDecoder.withCallback(this._callback);
 

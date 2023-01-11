@@ -4,6 +4,7 @@
 
 part of sync.http;
 
+// ignore: avoid_classes_with_only_static_members
 /// A simple synchronous HTTP client.
 ///
 /// This is a two-step process. When a [SyncHttpClientRequest] is returned the
@@ -78,7 +79,7 @@ class SyncHttpClientRequest {
   SyncHttpClientResponse close() {
     var queryString = '';
     if (uri.hasQuery) {
-      var query = StringBuffer();
+      final query = StringBuffer();
       query.write('?');
       uri.queryParameters.forEach((k, v) {
         query.write(Uri.encodeComponent(k));
@@ -88,7 +89,7 @@ class SyncHttpClientRequest {
       });
       queryString = query.toString().substring(0, query.length - 1);
     }
-    var buffer = StringBuffer();
+    final buffer = StringBuffer();
     buffer.write('$method ${uri.path}$queryString HTTP/$_protocolVersion\r\n');
     headers.forEach((name, values) {
       for (var value in values) {
@@ -135,7 +136,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
       case HttpHeaders.hostHeader:
         return ['$host:$port'];
       default:
-        var values = _headers[name];
+        final values = _headers[name];
         if (values == null || values.isEmpty) {
           return null;
         }
@@ -227,7 +228,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   /// returns null.
   @override
   String? value(String name) {
-    var val = this[name];
+    final val = this[name];
     if (val == null || val.isEmpty) {
       return null;
     } else if (val.length == 1) {
@@ -241,7 +242,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   @override
   void forEach(void Function(String name, List<String> values) f) {
     void forEachFunc(String name) {
-      var values = this[name];
+      final values = this[name];
       if (values != null && values.isNotEmpty) {
         f(name, values);
       }
@@ -263,7 +264,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
       value(HttpHeaders.transferEncodingHeader)?.toLowerCase() == 'chunked';
 
   @override
-  set chunkedTransferEncoding(bool _chunkedTransferEncoding) {
+  set chunkedTransferEncoding(bool chunkedTransferEncoding) {
     throw UnsupportedError('chunked transfer is unsupported');
   }
 
@@ -271,12 +272,12 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   int get contentLength => _request.contentLength;
 
   @override
-  set contentLength(int _contentLength) {
+  set contentLength(int contentLength) {
     throw UnsupportedError('content length is automatically set');
   }
 
   @override
-  set date(DateTime? _date) {
+  set date(DateTime? date) {
     throw UnsupportedError('date is unsupported');
   }
 
@@ -284,7 +285,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   DateTime? get date => null;
 
   @override
-  set expires(DateTime? _expires) {
+  set expires(DateTime? expires) {
     throw UnsupportedError('expires is unsupported');
   }
 
@@ -292,7 +293,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   DateTime? get expires => null;
 
   @override
-  set host(String? _host) {
+  set host(String? host) {
     throw UnsupportedError('host is automatically set');
   }
 
@@ -303,7 +304,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   DateTime? get ifModifiedSince => null;
 
   @override
-  set ifModifiedSince(DateTime? _ifModifiedSince) {
+  set ifModifiedSince(DateTime? ifModifiedSince) {
     throw UnsupportedError('if modified since is unsupported');
   }
 
@@ -316,12 +317,12 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
   bool get persistentConnection => false;
 
   @override
-  set persistentConnection(bool _persistentConnection) {
+  set persistentConnection(bool persistentConnection) {
     throw UnsupportedError('persistence connections are unsupported');
   }
 
   @override
-  set port(int? _port) {
+  set port(int? port) {
     throw UnsupportedError('port is automatically set');
   }
 
@@ -359,8 +360,8 @@ class SyncHttpClientResponse {
   factory SyncHttpClientResponse(RawSynchronousSocket socket) {
     int? statusCode;
     String? reasonPhrase;
-    var body = StringBuffer();
-    var headers = <String, List<String>>{};
+    final body = StringBuffer();
+    final headers = <String, List<String>>{};
 
     var inHeader = false;
     var inBody = false;
@@ -379,9 +380,9 @@ class SyncHttpClientResponse {
           }
           return;
         }
-        var separator = line.indexOf(':');
-        var name = line.substring(0, separator).toLowerCase().trim();
-        var value = line.substring(separator + 1).trim();
+        final separator = line.indexOf(':');
+        final name = line.substring(0, separator).toLowerCase().trim();
+        final value = line.substring(separator + 1).trim();
         if (name == HttpHeaders.transferEncodingHeader &&
             value.toLowerCase() != 'identity') {
           throw UnsupportedError('only identity transfer encoding is accepted');
@@ -403,13 +404,13 @@ class SyncHttpClientResponse {
       }
     }
 
-    var lineDecoder = _LineDecoder.withCallback(processLine);
+    final lineDecoder = _LineDecoder.withCallback(processLine);
 
     try {
       while (!inHeader ||
           !inBody ||
           ((contentRead + lineDecoder.bufferedBytes) < contentLength)) {
-        var bytes = socket.readSync(1024);
+        final bytes = socket.readSync(1024);
 
         if (bytes == null || bytes.isEmpty) {
           break;
@@ -453,15 +454,15 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
       value(HttpHeaders.transferEncodingHeader)?.toLowerCase() == 'chunked';
 
   @override
-  set chunkedTransferEncoding(bool _chunkedTransferEncoding) {
+  set chunkedTransferEncoding(bool chunkedTransferEncoding) {
     throw UnsupportedError('Response headers are immutable');
   }
 
   @override
   int get contentLength {
-    var val = value(HttpHeaders.contentLengthHeader);
+    final val = value(HttpHeaders.contentLengthHeader);
     if (val != null) {
-      var parsed = int.tryParse(val);
+      final parsed = int.tryParse(val);
       if (parsed != null) {
         return parsed;
       }
@@ -470,13 +471,13 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  set contentLength(int _contentLength) {
+  set contentLength(int contentLength) {
     throw UnsupportedError('Response headers are immutable');
   }
 
   @override
   ContentType? get contentType {
-    var val = value(HttpHeaders.contentTypeHeader);
+    final val = value(HttpHeaders.contentTypeHeader);
     if (val != null) {
       return ContentType.parse(val);
     }
@@ -484,18 +485,18 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  set contentType(ContentType? _contentType) {
+  set contentType(ContentType? contentType) {
     throw UnsupportedError('Response headers are immutable');
   }
 
   @override
-  set date(DateTime? _date) {
+  set date(DateTime? date) {
     throw UnsupportedError('Response headers are immutable');
   }
 
   @override
   DateTime? get date {
-    var val = value(HttpHeaders.dateHeader);
+    final val = value(HttpHeaders.dateHeader);
     if (val != null) {
       return DateTime.parse(val);
     }
@@ -503,13 +504,13 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  set expires(DateTime? _expires) {
+  set expires(DateTime? expires) {
     throw UnsupportedError('Response headers are immutable');
   }
 
   @override
   DateTime? get expires {
-    var val = value(HttpHeaders.expiresHeader);
+    final val = value(HttpHeaders.expiresHeader);
     if (val != null) {
       return DateTime.parse(val);
     }
@@ -521,13 +522,13 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
       _headers.forEach(f);
 
   @override
-  set host(String? _host) {
+  set host(String? host) {
     throw UnsupportedError('Response headers are immutable');
   }
 
   @override
   String? get host {
-    var val = value(HttpHeaders.hostHeader);
+    final val = value(HttpHeaders.hostHeader);
     if (val != null) {
       return Uri.parse(val).host;
     }
@@ -536,7 +537,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   DateTime? get ifModifiedSince {
-    var val = value(HttpHeaders.ifModifiedSinceHeader);
+    final val = value(HttpHeaders.ifModifiedSinceHeader);
     if (val != null) {
       return DateTime.parse(val);
     }
@@ -544,7 +545,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   }
 
   @override
-  set ifModifiedSince(DateTime? _ifModifiedSince) {
+  set ifModifiedSince(DateTime? ifModifiedSince) {
     throw UnsupportedError('Response headers are immutable');
   }
 
@@ -557,18 +558,18 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
   bool get persistentConnection => false;
 
   @override
-  set persistentConnection(bool _persistentConnection) {
+  set persistentConnection(bool persistentConnection) {
     throw UnsupportedError('Response headers are immutable');
   }
 
   @override
-  set port(int? _port) {
+  set port(int? port) {
     throw UnsupportedError('Response headers are immutable');
   }
 
   @override
   int? get port {
-    var val = value(HttpHeaders.hostHeader);
+    final val = value(HttpHeaders.hostHeader);
     if (val != null) {
       return Uri.parse(val).port;
     }
@@ -592,7 +593,7 @@ class _SyncHttpClientResponseHeaders implements HttpHeaders {
 
   @override
   String? value(String name) {
-    var val = this[name];
+    final val = this[name];
     if (val == null || val.isEmpty) {
       return null;
     } else if (val.length == 1) {
