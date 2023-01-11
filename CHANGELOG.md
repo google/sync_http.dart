@@ -1,3 +1,7 @@
+## v0.3.2-dev
+
+* Require Dart 2.18
+
 ## v0.3.1
 
 * Switch to using `package:lints/recommended.yaml`
