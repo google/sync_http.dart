@@ -1,17 +1,15 @@
-## v0.3.2-dev
+## 0.3.2-dev
 
 * Require Dart 2.18
 
-## v0.3.1
+## 0.3.1
 
 * Switch to using `package:lints/recommended.yaml`
 * Update the usage guidance in the readme.
 
-## v0.3.0
+## 0.3.0
 
 * Stable version for null safety.
-
-## v0.3.0-nullsafety.0
 
 * **BREAKING** `SyncHttpClient` functions now require the `url` parameter to be
   `Uri`. Previously, both `Uri` and `String` were supported.
@@ -21,7 +19,7 @@
 
 * Implement `chunkedTransferEncoding` getters.
 
-## v0.2.0
+## 0.2.0
 
 * Preparation for [HttpHeaders change]. Update signature of `add()`
   and `set()` to match new signature of `HttpHeaders`. The
@@ -29,14 +27,14 @@
 
   [HttpHeaders change]: https://github.com/dart-lang/sdk/issues/39657
 
-## v0.1.4
+## 0.1.4
 
 * Fixed issue where query parameters were not being sent as part of requests.
 
-## v0.1.3
+## 0.1.3
 
 * Updated SDK version upper bound to 3.0.0.
 
-## v0.1.2
+## 0.1.2
 
 * Require Dart 2.
