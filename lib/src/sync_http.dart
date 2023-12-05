@@ -2,7 +2,12 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of sync.http;
+import 'dart:convert';
+import 'dart:io'
+    show ContentType, HttpException, HttpHeaders, RawSynchronousSocket;
+import 'dart:typed_data' show BytesBuilder;
+
+import 'line_decoder.dart';
 
 // ignore: avoid_classes_with_only_static_members
 /// A simple synchronous HTTP client.
@@ -368,7 +373,7 @@ class SyncHttpClientResponse {
     var contentLength = 0;
     var contentRead = 0;
 
-    void processLine(String line, int bytesRead, _LineDecoder decoder) {
+    void processLine(String line, int bytesRead, LineDecoder decoder) {
       if (inBody) {
         body.write(line);
         contentRead += bytesRead;
@@ -404,7 +409,7 @@ class SyncHttpClientResponse {
       }
     }
 
-    final lineDecoder = _LineDecoder.withCallback(processLine);
+    final lineDecoder = LineDecoder.withCallback(processLine);
 
     try {
       while (!inHeader ||
