@@ -81,10 +81,6 @@ class TestServerStatus {
 
   bool get isStarted => _state == TestServerStatusState.started;
 
-  bool get isStopped => _state == TestServerStatusState.stopped;
-
-  bool get isError => _state == TestServerStatusState.error;
-
   int? get port => _port;
 
   final TestServerStatusState _state;

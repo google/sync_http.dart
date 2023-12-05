@@ -2,19 +2,20 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of sync.http;
+import 'dart:convert';
+import 'dart:typed_data' show BytesBuilder;
 
 // '\n' character
 const int _lineTerminator = 10;
 
-class _LineDecoder {
+class LineDecoder {
   final BytesBuilder _unprocessedBytes = BytesBuilder();
 
   int expectedByteCount = -1;
 
-  final void Function(String, int, _LineDecoder) _callback;
+  final void Function(String, int, LineDecoder) _callback;
 
-  _LineDecoder.withCallback(this._callback);
+  LineDecoder.withCallback(this._callback);
 
   void add(List<int> chunk) {
     while (chunk.isNotEmpty) {
