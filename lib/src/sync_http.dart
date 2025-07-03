@@ -63,8 +63,8 @@ class SyncHttpClientRequest {
   final RawSynchronousSocket _socket;
 
   SyncHttpClientRequest._(this.method, this.uri, bool body)
-      : _body = body ? BytesBuilder() : null,
-        _socket = RawSynchronousSocket.connectSync(uri.host, uri.port);
+    : _body = body ? BytesBuilder() : null,
+      _socket = RawSynchronousSocket.connectSync(uri.host, uri.port);
 
   /// Write content into the body of the HTTP request.
   void write(Object? obj) {
@@ -259,7 +259,7 @@ class _SyncHttpClientRequestHeaders implements HttpHeaders {
       HttpHeaders.connectionHeader,
       HttpHeaders.contentLengthHeader,
       HttpHeaders.contentTypeHeader,
-      HttpHeaders.hostHeader
+      HttpHeaders.hostHeader,
     ].forEach(forEachFunc);
     _headers.keys.forEach(forEachFunc);
   }
@@ -401,7 +401,8 @@ class SyncHttpClientResponse {
         headers[name]!.add(value);
       } else if (line.startsWith('HTTP/1.1') || line.startsWith('HTTP/1.0')) {
         statusCode = int.parse(
-            line.substring('HTTP/1.x '.length, 'HTTP/1.x xxx'.length));
+          line.substring('HTTP/1.x '.length, 'HTTP/1.x xxx'.length),
+        );
         reasonPhrase = line.substring('HTTP/1.x xxx '.length);
         inHeader = true;
       } else {
@@ -430,15 +431,20 @@ class SyncHttpClientResponse {
       }
     }
 
-    return SyncHttpClientResponse._(headers,
-        reasonPhrase: reasonPhrase,
-        statusCode: statusCode,
-        body: body.toString());
+    return SyncHttpClientResponse._(
+      headers,
+      reasonPhrase: reasonPhrase,
+      statusCode: statusCode,
+      body: body.toString(),
+    );
   }
 
-  SyncHttpClientResponse._(Map<String, List<String>> headers,
-      {this.reasonPhrase, this.statusCode, this.body})
-      : headers = _SyncHttpClientResponseHeaders(headers);
+  SyncHttpClientResponse._(
+    Map<String, List<String>> headers, {
+    this.reasonPhrase,
+    this.statusCode,
+    this.body,
+  }) : headers = _SyncHttpClientResponseHeaders(headers);
 }
 
 class _SyncHttpClientResponseHeaders implements HttpHeaders {
