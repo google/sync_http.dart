@@ -4,8 +4,8 @@ description: Synchronous HTTP client for Dart.
 repository: https://github.com/google/sync_http.dart
 
 environment:
-  sdk: ^3.0.0
+  sdk: ^3.7.0
 
 dev_dependencies:
-  dart_flutter_team_lints: ^2.0.0
-  test: ^1.16.0
+  dart_flutter_team_lints: ^3.0.0
+  test: ^1.16.6

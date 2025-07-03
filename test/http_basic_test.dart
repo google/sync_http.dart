@@ -49,10 +49,7 @@ class TestServerMain {
   }
 }
 
-enum TestServerCommandState {
-  start,
-  stop,
-}
+enum TestServerCommandState { start, stop }
 
 class TestServerCommand {
   TestServerCommand.start() : _command = TestServerCommandState.start;
@@ -66,11 +63,7 @@ class TestServerCommand {
   final TestServerCommandState _command;
 }
 
-enum TestServerStatusState {
-  started,
-  stopped,
-  error,
-}
+enum TestServerStatusState { started, stopped, error }
 
 class TestServerStatus {
   TestServerStatus.started(this._port) : _state = TestServerStatusState.started;
@@ -226,8 +219,9 @@ Future<void> testGET() async {
   final completer = Completer<void>();
   final testServerMain = TestServerMain();
   testServerMain.setServerStartedHandler((int? port) {
-    final request =
-        SyncHttpClient.getUrl(Uri.http('localhost:$port', '/0123456789'));
+    final request = SyncHttpClient.getUrl(
+      Uri.http('localhost:$port', '/0123456789'),
+    );
     final response = request.close();
     expect(HttpStatus.ok, equals(response.statusCode));
     expect(11, equals(response.contentLength));
@@ -249,8 +243,9 @@ Future<void> testPOST() async {
   void runTest(int? port) {
     var count = 0;
     void sendRequest() {
-      final request =
-          SyncHttpClient.postUrl(Uri.http('localhost:$port', '/echo'));
+      final request = SyncHttpClient.postUrl(
+        Uri.http('localhost:$port', '/echo'),
+      );
       request.write(data);
       final response = request.close();
       expect(HttpStatus.ok, equals(response.statusCode));
@@ -276,8 +271,9 @@ Future<void> test404() async {
   final completer = Completer<void>();
   final testServerMain = TestServerMain();
   testServerMain.setServerStartedHandler((int? port) {
-    final request =
-        SyncHttpClient.getUrl(Uri.http('localhost:$port', '/thisisnotfound'));
+    final request = SyncHttpClient.getUrl(
+      Uri.http('localhost:$port', '/thisisnotfound'),
+    );
     final response = request.close();
     expect(HttpStatus.notFound, equals(response.statusCode));
     expect('Page not found', equals(response.body));
@@ -292,12 +288,15 @@ Future<void> testReasonPhrase() async {
   final completer = Completer<void>();
   final testServerMain = TestServerMain();
   testServerMain.setServerStartedHandler((int? port) {
-    final request =
-        SyncHttpClient.getUrl(Uri.http('localhost:$port', '/reasonformoving'));
+    final request = SyncHttpClient.getUrl(
+      Uri.http('localhost:$port', '/reasonformoving'),
+    );
     final response = request.close();
     expect(HttpStatus.movedPermanently, equals(response.statusCode));
     expect(
-        "Don't come looking here any more\r\n", equals(response.reasonPhrase));
+      "Don't come looking here any more\r\n",
+      equals(response.reasonPhrase),
+    );
     testServerMain.close();
     completer.complete();
   });
